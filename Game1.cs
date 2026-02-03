@@ -17,6 +17,7 @@ public class Game1 : Game
     private float[] synthBuffer;
     private byte[] byteBuffer;
     private int channelCount = 2; // Stereo
+    private int note = 60;
     public Game1()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -45,8 +46,10 @@ public class Game1 : Game
         string sf2Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fluid.sf2");
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         player = new Player(sf2Path);
+        player.ProgramSelect(0, 0, 0);
+        player.SetOutput(0, 44100, -6f);
+        player.SetVolume(1f);
     }
-
     private bool notePlaying = false;
     private double noteOnTime = 0;
     private double duration = 0.5;
@@ -57,7 +60,7 @@ public class Game1 : Game
 
        if (!notePlaying && play)
         {
-            player.NoteOn(0, 60, 0.8f); // Middle C
+            player.NoteOn(0, note, 0.5f);
             noteOnTime = gameTime.TotalGameTime.TotalSeconds;
             notePlaying = true;
             play = false;
@@ -68,7 +71,7 @@ public class Game1 : Game
             double now = gameTime.TotalGameTime.TotalSeconds;
             if(now - noteOnTime >= duration)
             {
-                player.NoteOff(0, 60);
+                player.NoteOff(0, note);
                 notePlaying = false;
             }
         }
@@ -76,11 +79,10 @@ public class Game1 : Game
         while(dynSound.PendingBufferCount < 2)
         {
             player.Render(synthBuffer);
-            Console.WriteLine("Rendering audio buffer...");
-            Console.WriteLine($"synthBuffer length: {synthBuffer.Length}");
-            Console.WriteLine($"byteBuffer length: {byteBuffer.Length}");
+            // Console.WriteLine("Rendering audio buffer...");
+            // Console.WriteLine($"synthBuffer length: {synthBuffer.Length}");
+            // Console.WriteLine($"byteBuffer length: {byteBuffer.Length}");
             Buffer.BlockCopy(synthBuffer, 0, byteBuffer, 0, synthBuffer.Length * sizeof(float));
-            Console.WriteLine("Submitting audio buffer...");
             dynSound.SubmitBuffer(byteBuffer);
         }
         base.Update(gameTime);
