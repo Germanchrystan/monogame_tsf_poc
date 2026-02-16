@@ -23,6 +23,7 @@ namespace audio
     private MidiEvent[] midiEvents = Array.Empty<MidiEvent>();
     private float currentTime = 0;
     private int currentIndex = 0;
+    private bool On = false;
     public AudioRenderer(string sf2Path)
     {
       this.sf2Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sf2Path);
@@ -68,7 +69,7 @@ namespace audio
           Console.WriteLine("Player not initialized.");
           return;
         }
-
+        if (!On) return;
         float previousTime = currentTime;
         currentTime += deltaTime;
         while (midiEvents != null &&
@@ -95,6 +96,7 @@ namespace audio
           Buffer.BlockCopy(synthBuffer, 0, byteBuffer, 0, synthBuffer.Length * sizeof(short));
           dynSound.SubmitBuffer(byteBuffer);
         }
+        if (currentIndex >= midiEvents.Length) On = false;
       }
       catch (Exception ex)
       {
