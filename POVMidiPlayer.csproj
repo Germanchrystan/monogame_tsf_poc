@@ -33,9 +33,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-  <Content Include="fluid.sf2">
+  <Content Include="harp.sf2">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     <Link>dlui.sf2</Link>
+     <Link>harp.sf2</Link>
   </Content>
 </ItemGroup>
 </Project>
