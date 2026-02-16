@@ -1,7 +1,6 @@
 ﻿using System;
-using System.IO;
+using audio;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -11,13 +10,8 @@ public class Game1 : Game
 {
   private GraphicsDeviceManager _graphics;
   private SpriteBatch _spriteBatch;
-  private bool play = true;
-  private Player player;
-  private DynamicSoundEffectInstance dynSound;
-  private short[] synthBuffer;
-  private byte[] byteBuffer;
-  private int channelCount = 2; // Stereo
-  private int note = 60;
+  private AudioRenderer audio;
+  private MidiEvent[] midiEvents;
   public Game1()
   {
     _graphics = new GraphicsDeviceManager(this);
@@ -30,62 +24,40 @@ public class Game1 : Game
     try
     {
       base.Initialize();
-      dynSound = new DynamicSoundEffectInstance(44100, AudioChannels.Stereo);
-      dynSound.Play();
-
     }
     catch (Exception ex)
     {
       Console.WriteLine("Error during initialization: " + ex.Message);
     }
-    synthBuffer = new short[2048 * channelCount];
-    byteBuffer = new byte[synthBuffer.Length * sizeof(short)];
   }
-
   protected override void LoadContent()
   {
-    string sf2Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "fluid.sf2");
     _spriteBatch = new SpriteBatch(GraphicsDevice);
-    player = new Player(sf2Path);
-    player.ProgramSelect(0, 0, 0);
-    player.SetOutput(0, 44100, -6f);
-    player.SetVolume(1f);
+    audio = new AudioRenderer("fluid.sf2");
+      midiEvents =
+      [
+        new MidiEvent { Time = 0f, Channel = 0, Key = 60, Velocity = 1f, IsNoteOn = true },
+        new MidiEvent { Time = 0.5f, Channel = 0, Key = 60, Velocity = 0f, IsNoteOn = false },
+        new MidiEvent { Time = 1f, Channel = 0, Key = 62, Velocity = 1f, IsNoteOn = true },
+        new MidiEvent { Time = 1.5f, Channel = 0, Key = 62, Velocity = 0f, IsNoteOn = false },
+        new MidiEvent { Time = 2f, Channel = 0, Key = 64, Velocity = 1f, IsNoteOn = true },
+        new MidiEvent { Time = 2.5f, Channel = 0, Key = 64, Velocity = 0f, IsNoteOn = false },
+      ];
+    audio.LoadPlayer();
+    audio.LoadMidi(midiEvents);
   }
-  private bool notePlaying = false;
-  private double noteOnTime = 0;
-  private double duration = 0.5;
   protected override void Update(GameTime gameTime)
   {
     if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
       Exit();
-
-    if (!notePlaying && play)
+    try
     {
-      player.NoteOn(0, note, 0.5f);
-      noteOnTime = gameTime.TotalGameTime.TotalSeconds;
-      notePlaying = true;
-      play = false;
-    }
-
-    if (notePlaying)
+      audio.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+    } catch (Exception ex)
     {
-      double now = gameTime.TotalGameTime.TotalSeconds;
-      if (now - noteOnTime >= duration)
-      {
-        player.NoteOff(0, note);
-        notePlaying = false;
-      }
-    }
-
-    while (dynSound.PendingBufferCount < 2)
-    {
-      player.Render(synthBuffer);
-      // Console.WriteLine("Rendering audio buffer...");
-      // Console.WriteLine($"synthBuffer length: {synthBuffer.Length}");
-      // Console.WriteLine($"byteBuffer length: {byteBuffer.Length}");
-      Buffer.BlockCopy(synthBuffer, 0, byteBuffer, 0, synthBuffer.Length * sizeof(short));
-      dynSound.SubmitBuffer(byteBuffer);
-    }
+      Console.WriteLine("Error during update: " + ex.Message);
+      Console.WriteLine($"Is audio working? {(audio != null ? "Yes" : "No")}");
+    }  
     base.Update(gameTime);
   }
 
