@@ -11,13 +11,15 @@ public class Game1 : Game
   private GraphicsDeviceManager _graphics;
   private SpriteBatch _spriteBatch;
   private AVRenderer renderer;
-  private MidiEvent[] midiEvents;
   
   private float deltaTime = 0f;
   public Game1()
   {
     _graphics = new GraphicsDeviceManager(this);
     Content.RootDirectory = "Content";
+    _graphics.PreferredBackBufferWidth = Constants.WINDOW_WIDTH;
+    _graphics.PreferredBackBufferHeight = Constants.WINDOW_HEIGHT;
+    _graphics.ApplyChanges();
     IsMouseVisible = true;
   }
 

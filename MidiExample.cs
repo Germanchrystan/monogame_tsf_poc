@@ -12,12 +12,16 @@ namespace POVMidiPlayer
   {
     public static MidiEvent[] midiExample =
     [
-      new MidiEvent { Time = 0f, Channel = 0, Key = 60, Velocity = 1f, IsNoteOn = true },
-      new MidiEvent { Time = 0.5f, Channel = 0, Key = 60, Velocity = 0f, IsNoteOn = false },
-      new MidiEvent { Time = 1f, Channel = 0, Key = 62, Velocity = 1f, IsNoteOn = true },
-      new MidiEvent { Time = 1.5f, Channel = 0, Key = 62, Velocity = 0f, IsNoteOn = false },
-      new MidiEvent { Time = 2f, Channel = 0, Key = 64, Velocity = 1f, IsNoteOn = true },
-      new MidiEvent { Time = 2.5f, Channel = 0, Key = 64, Velocity = 0f, IsNoteOn = false },
+      new MidiEvent { Time = 0f, Channel = 0, Key = 71, Velocity = 1f, IsNoteOn = true },
+      new MidiEvent { Time = 0.5f, Channel = 0, Key = 71, Velocity = 0f, IsNoteOn = false },
+      new MidiEvent { Time = 1f, Channel = 0, Key = 69, Velocity = 1f, IsNoteOn = true },
+      new MidiEvent { Time = 1.5f, Channel = 0, Key = 69, Velocity = 0f, IsNoteOn = false },
+      new MidiEvent { Time = 2f, Channel = 0, Key = 67, Velocity = 1f, IsNoteOn = true },
+      new MidiEvent { Time = 2.5f, Channel = 0, Key = 67, Velocity = 0f, IsNoteOn = false },
+      new MidiEvent { Time = 3f, Channel = 0, Key = 65, Velocity = 1f, IsNoteOn = true },
+      new MidiEvent { Time = 3.5f, Channel = 0, Key = 65, Velocity = 0f, IsNoteOn = false },
+      new MidiEvent { Time = 4f, Channel = 0, Key = 64, Velocity = 1f, IsNoteOn = true },
+      new MidiEvent { Time = 4.5f, Channel = 0, Key = 64, Velocity = 0f, IsNoteOn = false },
     ];
   }
 }
