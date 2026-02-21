@@ -13,9 +13,9 @@ namespace fugue.level
     {
       IntervalData[] intervalData = new IntervalData[]
       {
-        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 4),      // C
-        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 4),    // D
-        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 4)     // E
+        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 2),    // C
+        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 2),    // D
+        new IntervalData(PitchInterval.SECOND, IntervalDirection.UP, 2)     // E
       };
 
       // Create a fixed piece with the three notes

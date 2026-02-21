@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+
 using tsybulya.GameObjects;
 using notation.scale;
 using notation.music_file;
 using notation.note;
-using POVMidiPlayer;
-using System.Collections.Generic;
+using midi;
 
 namespace entities.score
 {
@@ -37,7 +38,8 @@ namespace entities.score
       List<MidiEvent> allMidiEvents = new List<MidiEvent>();
       foreach (Staff staff in staffs)
       {
-        allMidiEvents.AddRange(staff.GetMidiEvents(musicFile.bpm));
+        MidiEvent[] staffMidiEvents = staff.GetMidiEvents(musicFile.bpm);
+        allMidiEvents.AddRange(staffMidiEvents);
       }
       return allMidiEvents.ToArray();
     }

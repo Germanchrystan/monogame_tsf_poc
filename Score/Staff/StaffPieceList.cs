@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 using entities.piece;
 using notation.note;
-using POVMidiPlayer;
+using midi;
 
 namespace entities.score
 {
@@ -84,25 +84,28 @@ namespace entities.score
       {
         BasePiece piece = placedPieces[index];
         float tickPosition = piece.TickPosition; // Tick position is number of beats from the start of the staff
-        float timeInSeconds = tickPosition * (60f / bpm); // Convert tick position to time in seconds based on BPM
+        float pieceTimePosition = tickPosition * (60f / bpm); // Convert tick position to time in seconds based on BPM
+        float innerPieceTimePosition = pieceTimePosition; // This will track the time position within the piece as we iterate through its intervals
         foreach (IntervalData data in piece.IntervalData)
         {
           Pitch newPitch = PitchUtils.GetPitchFromInterval(lastPitch, data.Interval);
+          float noteTimePosition = innerPieceTimePosition;
           midiEvents.Add(new MidiEvent()
           {
             Key = newPitch.AbsPitch,
-            Time = timeInSeconds,
+            Time = noteTimePosition,
             Velocity = 1f,
             IsNoteOn = true,
           });
           midiEvents.Add(new MidiEvent()
           {
             Key = newPitch.AbsPitch,
-            Time = timeInSeconds + (data.Duration * (60f / bpm)), // Note off event after the duration of the note
+            Time = noteTimePosition + (data.Duration * (60f / bpm)), // Note off event after the duration of the note
             Velocity = 0f,
             IsNoteOn = false,
           });
           lastPitch = newPitch;
+          innerPieceTimePosition += data.Duration * (60f / bpm);
         }
 
         index++;

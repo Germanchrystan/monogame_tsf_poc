@@ -1,4 +1,4 @@
-namespace POVMidiPlayer
+namespace midi
 {
   public struct MidiEvent
   {

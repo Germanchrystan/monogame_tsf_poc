@@ -14,7 +14,7 @@ namespace entities.piece
     public IntervalData(PitchInterval interval, IntervalDirection intervalDirection, int duration)
     {
       Interval = (int)interval * (int)intervalDirection;
-      Duration = duration;
+      Duration = duration; // TODO: Should change to float
     }
     public int Interval;
     public int Duration;

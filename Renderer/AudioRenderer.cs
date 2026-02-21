@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Xna.Framework.Audio;
-using POVMidiPlayer;
+using midi;
 
 namespace Renderer;
 
@@ -15,8 +16,9 @@ public class AudioRenderer
   private string sf2Path;
   private MidiEvent[] midiEvents = Array.Empty<MidiEvent>();
   private int currentIndex = 0;
-  private bool On = true;
-
+  public bool On = true;
+  float currentTime = 0f;
+  public float duration = 0f; // Will be set based on the MIDI events
   public AudioRenderer(string sf2Path)
   {
     this.sf2Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sf2Path);
@@ -46,10 +48,16 @@ public class AudioRenderer
   public void LoadMidi(MidiEvent[] midiEvents)
   {
     this.midiEvents = midiEvents;
-    // TODO: Sort events by time just in case
+    this.midiEvents = midiEvents.OrderBy(e => e.Time).ToArray();
+    if (midiEvents.Length > 0)
+    {
+      this.duration = midiEvents[midiEvents.Length - 1].Time + 0.5f; // Add a little extra time at the end
+    }
   }
-  public void Update(float currentTime)
+  public void Update(float deltaTime)
   {
+    currentTime += deltaTime;
+    if (currentTime >= duration) currentTime = 0f;
     if (player == null)
     {
       Console.WriteLine("Player not initialized.");
@@ -92,5 +100,9 @@ public class AudioRenderer
     {
       Console.WriteLine("Error during audio update: " + ex.Message);
     }
+  }
+  public void ToggleAudio()
+  {
+    On = !On;
   }
 }
