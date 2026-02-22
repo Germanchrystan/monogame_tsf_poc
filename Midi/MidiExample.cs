@@ -2,6 +2,7 @@ namespace midi
 {
   public struct MidiEvent
   {
+    public int Instrument; // TODO: Check how to use this with SoundFonts. Maybe need to add more fields for bank select and stuff?
     public float Time;
     public int Channel;
     public int Key;

@@ -9,6 +9,7 @@ namespace fugue.level
 {
   public class LevelScore
   {
+    private static int bpm = 120;
     public static Score CreateSimpleScore()
     {
       IntervalData[] intervalData = new IntervalData[]
@@ -29,7 +30,8 @@ namespace fugue.level
       Staff staff = new Staff(
         position: new Vector2(100, 200),
         size: new Vector2(500, 100),
-        totalTickDuration: 12  // Total duration for all notes
+        totalTickDuration: 12,  // Total duration for all notes
+        bpm: bpm
       )
       .SetClef(Clef.TrebleClef())
       .AddFixedPieces(new BasePiece[] { fixedPiece });
@@ -38,7 +40,7 @@ namespace fugue.level
       Score score = new Score(
         staffs: new Staff[] { staff },
         timeSignature: new TimeSignature { numerator = 4, denominator = 4 },
-        bpm: 120
+        bpm: bpm
       );
 
       return score;

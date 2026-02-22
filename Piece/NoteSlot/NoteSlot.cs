@@ -15,5 +15,13 @@ namespace entities.piece
       this.Transform = new Transform(position, new Vector2(scale, scale), 0);
       AddComponent(new SingleFrameRenderer(frameData, Color.Black, 200, Transform));
     }
+    public void TurnOn()
+    {
+      GetComponent<SingleFrameRenderer>().Color = Color.Red;
+    }
+    public void TurnOff()   
+    {
+      GetComponent<SingleFrameRenderer>().Color = Color.Black;
+    } 
   }
 }

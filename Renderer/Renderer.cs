@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework.Graphics;
-using POVMidiPlayer;
+using midi;
 
 namespace Renderer;
 

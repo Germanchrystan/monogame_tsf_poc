@@ -38,7 +38,7 @@ namespace entities.score
       List<MidiEvent> allMidiEvents = new List<MidiEvent>();
       foreach (Staff staff in staffs)
       {
-        MidiEvent[] staffMidiEvents = staff.GetMidiEvents(musicFile.bpm);
+        MidiEvent[] staffMidiEvents = staff.GetMidiEvents();
         allMidiEvents.AddRange(staffMidiEvents);
       }
       return allMidiEvents.ToArray();

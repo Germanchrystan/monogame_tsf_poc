@@ -2,7 +2,7 @@ using tsybulya.Scenes;
 using entities.score;
 using notation.music_file;
 using Renderer;
-using POVMidiPlayer;
+using midi;
 using System;
 using Microsoft.Xna.Framework.Input;
 

@@ -9,13 +9,25 @@ using midi;
 namespace entities.score
 {
 #nullable enable
+  public struct NotePlacementRef
+  {
+    public int PieceIndex;
+    public int IntervalIndex;
+    public float TimePosition;
+    public float Duration;
+  }
+
   public class StaffPieceList
   {
     private float totalTickDuration;
     private List<BasePiece> placedPieces = new List<BasePiece>();
-    public StaffPieceList(float totalTickDuration)
+    private List<NotePlacementRef> notePlacementRefs = new List<NotePlacementRef>();
+    public List<NotePlacementRef> NotePlacementRefs { get { return notePlacementRefs; } }
+    private float bpm;
+    public StaffPieceList(float totalTickDuration, float bpm)
     {
       this.totalTickDuration = totalTickDuration;
+      this.bpm = bpm;
     }
     public void Initialize(BasePiece[] fixedPieces, StaffConnector staffConnector)
     {
@@ -47,6 +59,7 @@ namespace entities.score
       newPiece.PlacePieceFromConnector(staffConnector.Transform.Position);
       placedPieces.Add(newPiece);
       placedPieces.Sort((a, b) => a.TickPosition.CompareTo(b.TickPosition));
+      // Checking piece fits
       try
       {
         int newPieceInt = placedPieces.FindIndex(x => x == newPiece);
@@ -66,6 +79,7 @@ namespace entities.score
             throw new Exception($"Cannot insert piece at position {newPiece.TickPosition} because it would overlap with the next piece.");
           }
         }
+        addNotePlacementRefsForPiece(newPiece);
       }
       catch (Exception e)
       {
@@ -75,11 +89,12 @@ namespace entities.score
       }
       staffConnector.MoveToRightPieceEnd(newPiece);
     }
-    public MidiEvent[] GetMidiEvents(Pitch initialPitch, float bpm) // Working with fixed bpm here
+    public MidiEvent[] GetMidiEvents(Pitch initialPitch) // Working with fixed bpm here
     {
       Pitch lastPitch = initialPitch;
       List<MidiEvent> midiEvents = new List<MidiEvent>();
       int index = 0;
+      // TODO !!!!!: i could use place notes ref list to generate midi events instead of iterating through pieces and intervals, would be more efficient and less error prone, but for now this works and is simpler to implement so leaving it like this for now
       while (index < placedPieces.Count)
       {
         BasePiece piece = placedPieces[index];
@@ -157,6 +172,7 @@ namespace entities.score
     }
     public void Remove(BasePiece piece)
     {
+      removeNotePlacementRefsForPiece(piece);
       placedPieces.Remove(piece);
     }
     public int Count
@@ -166,6 +182,33 @@ namespace entities.score
     public BasePiece GetAtIndex(int index)
     {
       return placedPieces[index];
+    }
+    public void PlayNote(int pieceIndex, int intervalIndex)
+    {
+      BasePiece piece = (BasePiece)placedPieces[pieceIndex];
+      piece.TurnOnNoteSlots(intervalIndex);
+    }
+    private void addNotePlacementRefsForPiece(BasePiece newPiece)
+    {
+      float timePosition = newPiece.TickPosition * (60f / bpm);
+      int intervalIndex = 0;
+      foreach (IntervalData data in newPiece.IntervalData)
+      {
+        notePlacementRefs.Add(new NotePlacementRef()
+        {
+          PieceIndex = placedPieces.FindIndex(x => x == newPiece),
+          IntervalIndex = intervalIndex,
+          TimePosition = timePosition,
+          Duration = data.Duration * (60f / bpm)
+        });
+        intervalIndex++;
+        timePosition += data.Duration * (60f / bpm);
+      }
+    }
+    private void removeNotePlacementRefsForPiece(BasePiece piece)
+    {
+      int pieceIndex = placedPieces.FindIndex(x => x == piece);
+      notePlacementRefs.RemoveAll(x => x.PieceIndex == pieceIndex);
     }
   }
 }

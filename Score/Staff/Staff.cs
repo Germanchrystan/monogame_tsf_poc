@@ -11,7 +11,7 @@ using entities.piece;
 using notation.note;
 using notation.clef;
 using notation.music_file;
-using POVMidiPlayer;
+using midi;
 
 namespace entities.score
 {
@@ -45,14 +45,15 @@ namespace entities.score
     private float spaceBetweenLines;
     private float marginsBetweenLines;
     // TODO: Stop using size. Get size.x from totalTickDuration and spaceBetweenLines. Get size.y from spaceBetweenLines and/or marginsBetweenLines.
-    public Staff(Vector2 position, Vector2 size, float totalTickDuration) : base(position, size, 0)
+    public Staff(Vector2 position, Vector2 size, float totalTickDuration, float bpm) : base(position, size, 0)
     {
       this.spaceBetweenLines = size.Y / 5;
       this.marginsBetweenLines = spaceBetweenLines / 2;
-      this.placedPieces = new StaffPieceList(totalTickDuration);
+      this.placedPieces = new StaffPieceList(totalTickDuration, bpm);
       createLines();
-      AddScripts([new PiecePlacement()]);
-      AddState(new State("IDLE", [], ["PiecePlacement"]));
+      AddScripts([new PiecePlacement(), new PlayingAudio()]);
+      AddState(new State("IDLE", ["PLAYING_AUDIO"], ["PiecePlacement", "PlayingAudio"]));
+      AddState(new State("PLAYING_AUDIO", ["IDLE"], ["PlayingAudio"]));
       AddComponent(new CollisionBox("STAFF", ScriptList, Transform, ReceiveMessage));
       AddChildren(new StaffConnector(new Vector2(Transform.Position.X, Transform.Position.Y + Transform.Size.Y / 2 - 4), size.Y));
       AddComponent(
@@ -79,9 +80,9 @@ namespace entities.score
         linePositionY += this.spaceBetweenLines;
       }
     }
-    public MidiEvent[] GetMidiEvents(float bpm)
+    public MidiEvent[] GetMidiEvents()
     {
-      return placedPieces.GetMidiEvents(clef.CentralNote, bpm);
+      return placedPieces.GetMidiEvents(clef.CentralNote);
     }
     public RealNote[] GetNotes()
     {
@@ -118,13 +119,13 @@ namespace entities.score
       return this;
     }
     // Static factory methods
-    public static Staff GetTrebleStaff(Vector2 position, Vector2 size, float tickDuration)
+    public static Staff GetTrebleStaff(Vector2 position, Vector2 size, float tickDuration, float bpm)
     {
-      return new Staff(position, size, tickDuration).SetClef(Clef.TrebleClef());
+      return new Staff(position, size, tickDuration, bpm).SetClef(Clef.TrebleClef());
     }
-    public static Staff GetBassStaff(Vector2 position, Vector2 size, float tickDuration)
+    public static Staff GetBassStaff(Vector2 position, Vector2 size, float tickDuration, float bpm)
     {
-      return new Staff(position, size, tickDuration).SetClef(Clef.BassClef());
+      return new Staff(position, size, tickDuration, bpm).SetClef(Clef.BassClef());
     }
   }
 }

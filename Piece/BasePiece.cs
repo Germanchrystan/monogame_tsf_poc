@@ -129,5 +129,14 @@ namespace entities.piece
         connectorPosition.Y + posDifferance.Y
       ));
     }
+    public void TurnOnNoteSlots(int index)
+    {
+      NoteSlot[] noteSlots = (NoteSlot[])GetChildren<NoteSlot>();
+      for (int i = 0; i < noteSlots.Count(); i++)
+      {
+        if (i == index) noteSlots[i].TurnOn();
+        else noteSlots[i].TurnOff();
+      }
+    }
   }
 }
