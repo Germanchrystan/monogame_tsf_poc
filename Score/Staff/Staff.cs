@@ -52,9 +52,8 @@ namespace entities.score
       this.marginsBetweenLines = spaceBetweenLines / 2;
       this.placedPieces = new StaffPieceList(totalTickDuration, bpm);
       createLines();
-      AddScripts([new PiecePlacement(), new PlayingAudio()]);
-      AddState(new State("IDLE", ["PLAYING_AUDIO"], ["PiecePlacement", "PlayingAudio"]));
-      AddState(new State("PLAYING_AUDIO", ["IDLE"], ["PlayingAudio"]));
+      AddScripts([new PiecePlacement()]);
+      AddState(new State("IDLE", [], ["PiecePlacement"]));
       AddComponent(new CollisionBox("STAFF", ScriptList, Transform, ReceiveMessage));
       AddChildren(new StaffConnector(new Vector2(Transform.Position.X, Transform.Position.Y + Transform.Size.Y / 2 - 4), size.Y));
       AddComponent(
