@@ -8,10 +8,10 @@ using tsybulya.Components.Collisions;
 using tsybulya.Components.GraphicComponents;
 
 using entities.piece;
-using notation.note;
 using notation.clef;
 using notation.music_file;
 using midi;
+using System.Collections.Generic;
 
 namespace entities.score
 {
@@ -41,6 +41,7 @@ namespace entities.score
     private int registerId;
     public int RegisterId { get { return registerId;  } }
     private StaffPieceList placedPieces;
+    public StaffPieceList StaffPieceList { get { return placedPieces; } }
     private Clef clef;
     private float spaceBetweenLines;
     private float marginsBetweenLines;
@@ -80,13 +81,9 @@ namespace entities.score
         linePositionY += this.spaceBetweenLines;
       }
     }
-    public MidiEvent[] GetMidiEvents()
+    public void GetMidiEvents(List<MidiEvent> midiEvents, List<NoteSlotRef> noteSlotRefs)
     {
-      return placedPieces.GetMidiEvents(clef.CentralNote);
-    }
-    public RealNote[] GetNotes()
-    {
-      return placedPieces.GetNotes(clef.CentralNote);
+      placedPieces.GetMidiEvents(clef.CentralNote, midiEvents, noteSlotRefs);
     }
     public Staff SetClef(Clef clef)
     {

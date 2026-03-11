@@ -6,15 +6,14 @@ namespace Renderer;
 public class AVRenderer
 {
   private const float EXTRA_TIME = 0.5f;
-  AudioRenderer audio;
   VideoVisualizer visualizer;
   public float currentTime = 0f;
   public float duration = 0f;  
   public AVRenderer(string sf2Path, MidiEvent[] midiEvents, GraphicsDevice graphicsDevice)
   {
-    audio = new AudioRenderer(sf2Path);
-    audio.LoadPlayer();
-    audio.LoadMidi(midiEvents);
+    AudioRenderer.Initialize(sf2Path);
+    AudioRenderer.LoadPlayer();
+    AudioRenderer.LoadMidi(midiEvents);
     visualizer = new VideoVisualizer(midiEvents, graphicsDevice);
     this.duration = midiEvents[midiEvents.Length - 1].Time + EXTRA_TIME;
   }
@@ -22,7 +21,7 @@ public class AVRenderer
   {
     currentTime += deltaTime;
     if (currentTime >= duration) currentTime = 0f;
-    audio.Update(currentTime);
+    AudioRenderer.Update(currentTime);
     visualizer.Update(currentTime);
   }
   public void Render(SpriteBatch spriteBatch)

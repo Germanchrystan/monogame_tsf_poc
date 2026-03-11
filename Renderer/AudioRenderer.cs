@@ -5,21 +5,27 @@ using Microsoft.Xna.Framework.Audio;
 using midi;
 
 namespace Renderer;
-
-public class AudioRenderer
+public sealed class AudioRenderer
 {
   private DynamicSoundEffectInstance dynSound;
   private short[] synthBuffer;
   private byte[] byteBuffer;
-  private int channelCount = 2; // Stereo
+  private readonly int channelCount = 2; // Stereo
   private Player player;
-  private string sf2Path;
+  private string sf2Path = string.Empty;
   private MidiEvent[] midiEvents = Array.Empty<MidiEvent>();
   private int currentIndex = 0;
-  public bool On = true;
-  float currentTime = 0f;
-  public float duration = 0f; // Will be set based on the MIDI events
-  public AudioRenderer(string sf2Path)
+  private bool on = false;
+  private float currentTime = 0f;
+  private float duration = 0f; // Will be set based on the MIDI events
+
+  private static AudioRenderer instance;
+  public static bool On => instance != null && instance.on;
+
+  private AudioRenderer()
+  {
+  }
+  private void initialize(string sf2Path)
   {
     this.sf2Path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, sf2Path);
     if (!File.Exists(this.sf2Path))
@@ -32,7 +38,15 @@ public class AudioRenderer
     synthBuffer = new short[2048 * channelCount];
     byteBuffer = new byte[synthBuffer.Length * sizeof(short)];
   }
-  public void LoadPlayer()
+  public static void Initialize(string sf2Path)
+  {
+    if (instance == null)
+    {
+      instance = new AudioRenderer();
+    }
+    instance.initialize(sf2Path);
+  }
+  private void loadPlayer()
   {
     player = new Player(sf2Path);
     if (player == null)
@@ -45,7 +59,16 @@ public class AudioRenderer
     player.SetOutput(0, 44100, -6f);
     player.SetVolume(1f);
   }
-  public void LoadMidi(MidiEvent[] midiEvents)
+  public static void LoadPlayer()
+  {
+    if (instance == null)
+    {
+      Console.WriteLine("AudioRenderer not initialized.");
+      return;
+    }
+    instance.loadPlayer();
+  }
+  private void loadMidi(MidiEvent[] midiEvents)
   {
     this.midiEvents = midiEvents;
     this.midiEvents = midiEvents.OrderBy(e => e.Time).ToArray();
@@ -54,7 +77,16 @@ public class AudioRenderer
       this.duration = midiEvents[midiEvents.Length - 1].Time + 0.5f; // Add a little extra time at the end
     }
   }
-  public void Update(float deltaTime)
+  public static void LoadMidi(MidiEvent[] midiEvents)
+  {
+    if (instance == null)
+    {
+      Console.WriteLine("AudioRenderer not initialized.");
+      return;
+    }
+    instance.loadMidi(midiEvents);
+  }
+  public void update(float deltaTime)
   {
     currentTime += deltaTime;
     if (currentTime >= duration) currentTime = 0f;
@@ -101,8 +133,26 @@ public class AudioRenderer
       Console.WriteLine("Error during audio update: " + ex.Message);
     }
   }
-  public void ToggleAudio()
+  public static void Update(float deltaTime)
   {
-    On = !On;
+    if (instance == null)
+    {
+      Console.WriteLine("AudioRenderer not initialized.");
+      return;
+    }
+    instance.update(deltaTime);
+  }
+  private void toggleAudio()
+  {
+    on = !on;
+  }
+  public static void ToggleAudio()
+  {
+    if (instance == null)
+    {
+      Console.WriteLine("AudioRenderer not initialized.");
+      return;
+    }
+    instance.toggleAudio();
   }
 }

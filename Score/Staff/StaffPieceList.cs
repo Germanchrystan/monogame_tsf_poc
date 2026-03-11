@@ -89,22 +89,25 @@ namespace entities.score
       }
       staffConnector.MoveToRightPieceEnd(newPiece);
     }
-    public MidiEvent[] GetMidiEvents(Pitch initialPitch) // Working with fixed bpm here
+    public void GetMidiEvents(Pitch initialPitch, List<MidiEvent> midiEvents, List<NoteSlotRef> noteSlotRefs) // Working with fixed bpm here
     {
       Pitch lastPitch = initialPitch;
-      List<MidiEvent> midiEvents = new List<MidiEvent>();
-      int index = 0;
+      int placePiecesIndex = 0;
       // TODO !!!!!: i could use place notes ref list to generate midi events instead of iterating through pieces and intervals, would be more efficient and less error prone, but for now this works and is simpler to implement so leaving it like this for now
-      while (index < placedPieces.Count)
+      while (placePiecesIndex < placedPieces.Count)
       {
-        BasePiece piece = placedPieces[index];
+        BasePiece piece = placedPieces[placePiecesIndex];
         float tickPosition = piece.TickPosition; // Tick position is number of beats from the start of the staff
         float pieceTimePosition = tickPosition * (60f / bpm); // Convert tick position to time in seconds based on BPM
         float innerPieceTimePosition = pieceTimePosition; // This will track the time position within the piece as we iterate through its intervals
+        NoteSlot[] noteSlots = piece.GetNoteSlots();
+        int noteSlotIndex = 0;
         foreach (IntervalData data in piece.IntervalData)
         {
+          // Midi Events
           Pitch newPitch = PitchUtils.GetPitchFromInterval(lastPitch, data.Interval);
           float noteTimePosition = innerPieceTimePosition;
+          float noteOffTimePosition = noteTimePosition + (data.Duration * (60f / bpm));
           midiEvents.Add(new MidiEvent()
           {
             Key = newPitch.AbsPitch,
@@ -115,45 +118,33 @@ namespace entities.score
           midiEvents.Add(new MidiEvent()
           {
             Key = newPitch.AbsPitch,
-            Time = noteTimePosition + (data.Duration * (60f / bpm)), // Note off event after the duration of the note
+            Time = noteOffTimePosition, // Note off event after the duration of the note
             Velocity = 0f,
             IsNoteOn = false,
           });
           lastPitch = newPitch;
           innerPieceTimePosition += data.Duration * (60f / bpm);
+
+          // Note Slot Refs
+          NoteSlot noteSlot = noteSlots[noteSlotIndex];
+          noteSlotRefs.Add(new NoteSlotRef()
+          {
+            NoteSlot = noteSlot,
+            TimePosition = noteTimePosition,
+            NoteEvent = true,
+          });
+          noteSlotRefs.Add(new NoteSlotRef()
+          {
+            NoteSlot = noteSlot,
+            TimePosition = noteOffTimePosition,
+            NoteEvent = false,
+          });
+
+          noteSlotIndex++;
         }
 
-        index++;
+        placePiecesIndex++;
       }
-
-      return midiEvents.ToArray();
-    }
-    public RealNote[] GetNotes(Pitch initialPitch)
-    {
-      Pitch lastPitch = initialPitch;
-      List<RealNote> notes = new List<RealNote>();
-      int index = 0;
-
-      while (index < placedPieces.Count)
-      {
-        BasePiece piece = placedPieces[index];
-        float tickPosition = piece.TickPosition;
-        foreach (IntervalData data in piece.IntervalData)
-        {
-          Pitch newPitch = PitchUtils.GetPitchFromInterval(lastPitch, data.Interval);
-          notes.Add(new RealNote(
-            newPitch,
-            tickPosition,
-            data.Duration
-          ));
-
-          lastPitch = newPitch;
-          tickPosition += data.Duration;
-        }
-        index++;
-      }
-
-      return notes.ToArray();
     }
     public bool IsComplete()
     {
@@ -182,11 +173,6 @@ namespace entities.score
     public BasePiece GetAtIndex(int index)
     {
       return placedPieces[index];
-    }
-    public void PlayNote(int pieceIndex, int intervalIndex)
-    {
-      BasePiece piece = (BasePiece)placedPieces[pieceIndex];
-      piece.TurnOnNoteSlots(intervalIndex);
     }
     private void addNotePlacementRefsForPiece(BasePiece newPiece)
     {

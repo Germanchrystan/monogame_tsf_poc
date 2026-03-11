@@ -22,6 +22,6 @@ namespace entities.piece
     public void TurnOff()   
     {
       GetComponent<SingleFrameRenderer>().Color = Color.Black;
-    } 
+    }
   }
 }

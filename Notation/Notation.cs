@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using midi;
 using notation.note;
 
 namespace notation.music_file
@@ -24,7 +25,7 @@ namespace notation.music_file
   }
   public struct MusicFile
   {
-    public Voice[] voices;
+    public MidiEvent[] midi;
     public TimeSignature timeSignature;
     public int bpm;
   }

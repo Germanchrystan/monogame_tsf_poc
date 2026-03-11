@@ -121,7 +121,7 @@ namespace entities.piece
     }
     public void PlacePieceFromConnector(Vector2 connectorPosition)
     {
-      LeftPieceEnd leftPieceEnd = (LeftPieceEnd)GetChildren<LeftPieceEnd>()[0];
+      LeftPieceEnd leftPieceEnd = GetChildren<LeftPieceEnd>()[0];
       Transform pieceEndTransform = leftPieceEnd.Transform;
       Vector2 posDifferance = new Vector2(this.Transform.Position.X - pieceEndTransform.Position.X, this.Transform.Position.Y - pieceEndTransform.Position.Y);
       this.Transform.SetPosition(new Vector2(
@@ -129,14 +129,9 @@ namespace entities.piece
         connectorPosition.Y + posDifferance.Y
       ));
     }
-    public void TurnOnNoteSlots(int index)
+    public NoteSlot[] GetNoteSlots()
     {
-      NoteSlot[] noteSlots = (NoteSlot[])GetChildren<NoteSlot>();
-      for (int i = 0; i < noteSlots.Count(); i++)
-      {
-        if (i == index) noteSlots[i].TurnOn();
-        else noteSlots[i].TurnOff();
-      }
+      return GetChildren<NoteSlot>();
     }
   }
 }

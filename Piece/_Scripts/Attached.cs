@@ -6,7 +6,6 @@ using tsybulya.Components.States;
 using tsybulya.Singletons;
 using entities.piece;
 
-
 namespace entities.piece_end
 {
   public class Attached : Script

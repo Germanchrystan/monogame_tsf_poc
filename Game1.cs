@@ -5,7 +5,7 @@ using fugue.scenes.level;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using Renderer;
 using tsybulya.Components.GraphicComponents;
 using tsybulya.Components.States;
 using tsybulya.Managers;
@@ -87,6 +87,9 @@ namespace POVMidiPlayer
       {
         // new Command(Mouse.GetState().LeftButton, Constants.LEFT),
       });
+
+      AudioRenderer.Initialize("fluid.sf2");
+      AudioRenderer.LoadPlayer();
 
       // Level level = new Level(Score.ScoreFactory("test.mid"), new BasePiece[] { });
       Level level = new Level(LevelScore.CreateSimpleScore());
